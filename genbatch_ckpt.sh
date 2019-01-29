@@ -1,11 +1,28 @@
 #!/bin/bash
 
-file="demofile"
+file=$1
 dir=$(pwd)
-subfolder=$1
+subfolder=$2 #make a subfolder to contain all calculations
+initPartition=$3
 
+if [ -z $file ] || [ -z $subfolder ]; then
+  echo 'Usage: ./genbatch_ckpt.sh file_list(content has no extension) target_sub_folder desiredInitPartition'
+  exit 1
+fi
+
+if [ -z $initPartition ]; then
+  initPartition='ilahie'
+  echo "using ilahie for initial job partition"
+fi
+
+dependencyList="dependency_batch.sh"
 mkdir ${subfolder}
-touch dependency_batch.sh
+if [ ! -f $dependencyList ]; then
+  touch $dependencyList
+else
+  rm $dependencyList
+  touch $dependencyList
+fi
 
 while read -r line
 do
@@ -15,12 +32,13 @@ do
   cp ${finit}  ${dir}/${subfolder}/${fname}_opt/
   fckpt=${line}_ckpt.gjf
   targetpath=${dir}/${subfolder}/${fname}_opt
-  
+  ROUTE=$(echo $(grep '#' $finit))
+  CKPT_ROUTE=${ROUTE/opt/opt(restart)}
   cat > "$dir/${subfolder}/${fname}_opt/${fckpt}" << EOF
 %mem=100gb
 %nproc=28       
 %Chk=${fname}.chk
-#p opt(restart) wb97xd/6-31+g(d,p) scf=(xqc, tight)  pop=min scrf=(pcm,solvent=water)
+${CKPT_ROUTE}
 
 
 EOF
@@ -87,13 +105,13 @@ exit 0
 EOF
   
  
-  echo "initjob=\$(sbatch ${targetpath}/${fname}_init.sh) && sbatch --dependency=afterany:\${initjob##* } ${targetpath}/${fname}_ckpt.sh" >> "dependency_batch.sh"
+  echo "initjob=\$(sbatch ${targetpath}/${fname}_init.sh) && sbatch --dependency=afterany:\${initjob##* } ${targetpath}/${fname}_ckpt.sh" >> ${dependencyList}
 
 
 
 done<${file}
 
-
+echo "please run bash ${dependencyList} to submit ckpt dependency jobs"
 
 
 
