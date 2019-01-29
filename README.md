@@ -14,8 +14,8 @@ And restart jobs will use the same functionals as the initial jobs
 intermediate log files will be stored in corresponding folder of the initial geometry(generated with this script as well)
 ## usage
 #### ./genbatch_ckpt.sh `file_list` `subfolder` `desiredInitialPartition(optional)`  
-  e.g.  ./genbatch_ckpt.sh filelist sub_opt chem
-  e.g. ./genbatch_ckpt.sh ALL sub_opt 
+  `e.g.  ./genbatch_ckpt.sh filelist sub_opt chem`  
+  `e.g. ./genbatch_ckpt.sh ALL sub_opt`   
 `filelist` a filename that has a list of selected (.gjf) including filenames but  __without extension__, line by line, see example filelist  
 if wish to submit all .gjf files into calculation, simply type `ALL` instead at corresponding field
 `subfolder` a subfolder to store all calculations relative to current wdir  
