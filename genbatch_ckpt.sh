@@ -6,7 +6,8 @@ subfolder=$2 #make a subfolder to contain all calculations
 initPartition=$3
 
 if [ -z $file ] || [ -z $subfolder ]; then
-  echo 'Usage: ./genbatch_ckpt.sh file_list(content has no extension) target_sub_folder desiredInitPartition'
+  echo 'Usage: ./genbatch_ckpt.sh file_list(content has no .gjf extension) target_sub_folder desiredInitPartition'
+  echo 'if wish to use all .gjf file in current directory, type in "ALL" for the file_list parameter'
   exit 1
 fi
 
@@ -16,6 +17,13 @@ if [ -z $initPartition ]; then
 fi
 
 dependencyList="dependency_batch.sh"
+
+if [ $file = ALL ]; then
+  ls *.gjf > "all_flist"
+  sed -i 's/.gjf//g' "all_flist"
+  file="all_flist"
+fi
+
 mkdir ${subfolder}
 if [ ! -f $dependencyList ]; then
   touch $dependencyList
@@ -51,8 +59,8 @@ EOF
 #SBATCH --time=5:00:00
 #SBATCH --mem=118G
 #SBATCH --workdir=${dir}/${subfolder}/${fname}_opt/
-#SBATCH --partition=ilahie
-#SBATCH --account=ilahie
+#SBATCH --partition=${initPartition}
+#SBATCH --account=${initPartition}
 
 # load Gaussian environment
 module load contrib/g16.a03

@@ -1,0 +1,6 @@
+%mem=100gb
+%nproc=28       
+%Chk=v4-H.chk
+# opt(restart) b3lyp/6-31g(d,p) pop=min scf=(xqc,tight)
+
+
